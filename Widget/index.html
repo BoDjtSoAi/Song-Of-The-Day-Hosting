@@ -17,7 +17,6 @@
         trackUrl: "https://github.com/BoDjtSoAi/Song-Of-The-Day-Hosting/raw/f723ce270e3750f14a6daed4e9f4c971a48f5d81/Music/Files/talking.mp3"
       },
       // Add more songs as needed following the same format
-      
     ];
 
     // Player appearance settings - customize as needed
@@ -318,43 +317,6 @@
     
     .button:hover { background-color: #d6d6de; }
     .button:hover i { color: #fff; }
-    
-    #playlist-container {
-      position: absolute;
-      top: 120px;
-      width: 430px;
-      max-height: 300px;
-      overflow-y: auto;
-      background-color: #fff;
-      border-radius: 0 0 15px 15px;
-      box-shadow: 0 1px 5px #cecece;
-      z-index: 1;
-    }
-    
-    .playlist-item {
-      padding: 10px 15px;
-      border-bottom: 1px solid #efefef;
-      cursor: pointer;
-      transition: 0.2s ease background-color;
-    }
-    
-    .playlist-item:hover {
-      background-color: #f8f8f8;
-    }
-    
-    .playlist-item.active {
-      background-color: #ffe8ee;
-    }
-    
-    .song-title {
-      font-weight: bold;
-      color: var(--player-text);
-    }
-    
-    .song-artist {
-      font-size: 12px;
-      color: var(--player-subtext);
-    }
   </style>
 </head>
 <body>
@@ -398,7 +360,6 @@
         </div>
       </div>
     </div>
-    <div id="playlist-container"></div>
   </div>
 
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -454,43 +415,12 @@
           albumArt.append(imgElement);
         });
       }
-      
-      // Generate playlist
-      function generatePlaylist() {
-        let playlistContainer = $('#playlist-container');
-        playlistContainer.empty();
-        
-        musicLibrary.forEach((song, index) => {
-          let playlistItem = $('<div>', {
-            class: 'playlist-item',
-            'data-index': index
-          });
-          
-          playlistItem.html(`
-            <div class="song-title">${song.trackName}</div>
-            <div class="song-artist">${song.albumName}</div>
-          `);
-          
-          playlistItem.on('click', function() {
-            let songIndex = parseInt($(this).attr('data-index'));
-            selectTrack(2, songIndex); // Custom play from playlist
-          });
-          
-          playlistContainer.append(playlistItem);
-        });
-      }
-
-      function updatePlaylistActiveState() {
-        $('.playlist-item').removeClass('active');
-        $(`.playlist-item[data-index="${currIndex}"]`).addClass('active');
-      }
 
       function playPause() {
         setTimeout(function() {
           if(audio.paused) {
             playerTrack.addClass('active');
             albumArt.addClass('active');
-            checkBuffering();
             i.attr('class','fas fa-pause');
             audio.play();
           } else {
@@ -592,35 +522,18 @@
           seekBar.width(0);
           tProgress.text('00:00');
           albumArt.removeClass('buffering').removeClass('active');
-          clearInterval(buffInterval);
           selectTrack(1); // Auto play next track
         }
       }
     
-      function checkBuffering() {
-        clearInterval(buffInterval);
-        buffInterval = setInterval(function() { 
-          if((nTime == 0) || (bTime - nTime) > 1000)
-            albumArt.addClass('buffering');
-          else
-            albumArt.removeClass('buffering');
+      function selectTrack(flag) {
+        if(flag == 0 || flag == 1)
+          ++currIndex;
+        else
+          --currIndex;
 
-          bTime = new Date();
-          bTime = bTime.getTime();
-        }, 100);
-      }
-
-      function selectTrack(flag, specificIndex = null) {
-        if(specificIndex !== null) {
-          // Play specific track from playlist
-          currIndex = specificIndex;
-        } else {
-          // Normal next/previous handling
-          if(flag == 0 || flag == 1)
-            ++currIndex;
-          else
-            --currIndex;
-        }
+        if(currIndex < 0) currIndex = musicLibrary.length - 1;
+        if(currIndex >= musicLibrary.length) currIndex = 0;
 
         if((currIndex > -1) && (currIndex < musicLibrary.length)) {
           if(flag == 0)
@@ -648,8 +561,14 @@
             playerTrack.addClass('active');
             albumArt.addClass('active');
           
-            clearInterval(buffInterval);
-            checkBuffering();
+            // Simplified buffering check
+            audio.addEventListener('canplay', function() {
+              albumArt.removeClass('buffering');
+            });
+            
+            audio.addEventListener('waiting', function() {
+              albumArt.addClass('buffering');
+            });
           }
 
           albumName.text(currentSong.albumName);
@@ -662,24 +581,12 @@
           // Update background artwork
           bgArtworkUrl = currentSong.albumArt;
           bgArtwork.css({'background-image': `url(${bgArtworkUrl})`});
-          
-          // Update playlist highlighting
-          updatePlaylistActiveState();
-        } else {
-          // Handle boundary cases
-          if(flag == 0 || flag == 1)
-            --currIndex;
-          else
-            ++currIndex;
         }
       }
 
       function initPlayer() {
         // Initialize album art images
         initializeAlbumArt();
-        
-        // Generate playlist
-        generatePlaylist();
         
         // Set up player
         audio.loop = false;
@@ -694,6 +601,28 @@
 
         playPreviousTrackButton.on('click', function() { selectTrack(-1); });
         playNextTrackButton.on('click', function() { selectTrack(1); });
+        
+        // Add additional event listeners to help with buffering state
+        audio.addEventListener('loadstart', function() {
+          albumArt.addClass('buffering');
+        });
+        
+        audio.addEventListener('canplay', function() {
+          albumArt.removeClass('buffering');
+        });
+        
+        audio.addEventListener('waiting', function() {
+          albumArt.addClass('buffering');
+        });
+        
+        audio.addEventListener('playing', function() {
+          albumArt.removeClass('buffering');
+        });
+        
+        audio.addEventListener('error', function() {
+          console.error('Error loading audio file');
+          albumArt.removeClass('buffering');
+        });
         
         // Start with first track
         if (musicLibrary.length > 0) {

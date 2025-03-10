@@ -34,7 +34,7 @@
     
     .player-container {
       width: 100%;
-      height: 160px; /* Always full-size (previously was the "lyrics on" state) */
+      height: 160px;
       position: relative;
       display: flex;
       align-items: center;
@@ -76,8 +76,7 @@
       height: 100%;
       justify-content: flex-end;
       padding-bottom: 15px;
-      /* Always positioned at the bottom */
-      transform: translateY(calc(100% - 70px));
+      /* Fixed: removed transform that was pushing controls down */
     }
     
     .track-info {
@@ -105,7 +104,7 @@
       margin-bottom: 10px;
       opacity: 0.8;
       position: relative;
-      z-index: 10; /* Ensure it's above other elements */
+      z-index: 10;
     }
     
     .progress-container {
@@ -119,7 +118,7 @@
       background: rgba(255, 255, 255, 0.2);
       cursor: pointer;
       position: relative;
-      z-index: 10; /* Make progress bar visible */
+      z-index: 10;
     }
     
     .progress {
@@ -170,12 +169,12 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
       transition: transform 0.2s ease, background 0.2s ease;
       z-index: 10;
-      transform: translateY(calc(100% - 70px)); /* Always positioned like lyrics mode */
+      /* Fixed: removed transform that was pushing button down */
       opacity: 0.8;
     }
     
     .play-button:hover {
-      transform: scale(1.05) translateY(calc(100% - 70px));
+      transform: scale(1.05);
       background: white;
       opacity: 1;
     }
@@ -189,29 +188,29 @@
     .lyrics-container {
       position: absolute;
       top: 0;
-      right: 0; /* Aligned to the right */
-      width: 70%; /* Take up 70% of the container width */
+      right: 0;
+      width: 70%;
       height: 70%;
       display: flex;
       flex-direction: column;
-      align-items: flex-end; /* Align to the right */
+      align-items: flex-end;
       justify-content: center;
       pointer-events: none;
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.7s ease-in-out;
-      padding: 0 60px 0 0; /* Padding on the right side */
+      padding: 0 60px 0 0;
     }
     
     .lyrics-display {
       color: rgba(255, 255, 255, 0.3);
       font-size: 16px;
-      text-align: right; /* Right-aligned text */
+      text-align: right;
       transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
       transform: translateY(20px);
       opacity: 0;
       font-weight: bold;
-      width: 70%; /* Width of lyrics text */
+      width: 70%;
       overflow: hidden;
       text-overflow: ellipsis;
       margin: 5px 0;
@@ -246,7 +245,7 @@
       cursor: pointer;
       transition: background 0.2s ease;
       z-index: 10;
-      display: none; /* Initially hidden, will show if lyrics available */
+      display: none;
     }
     
     .lyrics-toggle:hover {
@@ -258,7 +257,6 @@
       color: black;
     }
     
-    /* Animation for lyrics transition - simplified vertical scroll */
     @keyframes scrollUp {
       from { transform: translateY(30px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
@@ -368,7 +366,6 @@
       // Load lyrics from LRC file
       function loadLyrics(url) {
         if (!url) {
-          // If no URL is provided, don't try to load lyrics
           console.log("No lyrics URL provided");
           return;
         }
@@ -386,13 +383,11 @@
             
             if (lyrics.length > 0) {
               lyricsLoaded = true;
-              // Show lyrics toggle button only if lyrics are available
               lyricsToggle.css('display', 'block');
             }
           })
           .catch(error => {
             console.error("Error loading lyrics:", error);
-            // Keep lyrics toggle button hidden on error
           });
       }
       

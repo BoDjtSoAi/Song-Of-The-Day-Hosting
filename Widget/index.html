@@ -32,7 +32,7 @@
     }
     
     .player-container {
-      width: 500px;
+      width: 100%;
       height: 100px;
       position: relative;
       display: flex;
@@ -64,27 +64,6 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
-    }
-    
-    .album-art {
-      width: 80px;
-      height: 80px;
-      margin-left: 10px;
-      border-radius: 10px;
-      overflow: hidden;
-      flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: transform 0.3s ease;
-    }
-    
-    .album-art:hover {
-      transform: scale(1.05);
-    }
-    
-    .album-art img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
     
     .player-controls {
@@ -187,18 +166,11 @@
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
-    
-    .playing .album-art {
-      animation: pulse 2s infinite;
-    }
   </style>
 </head>
 <body>
   <div class="player-container">
     <div class="player-bg"></div>
-    <div class="album-art">
-      <img src="" alt="Album Art">
-    </div>
     <div class="player-controls">
       <div class="track-info">
         <div class="track-name"></div>
@@ -223,7 +195,6 @@
   <script>
     $(function() {
       // DOM Elements
-      const albumArt = $('.album-art img');
       const playerBg = $('.player-bg');
       const trackNameEl = $('.track-name');
       const artistNameEl = $('.artist-name');
@@ -241,7 +212,6 @@
       // Initialize Player
       function initPlayer() {
         // Set song details
-        albumArt.attr('src', song.albumArt);
         playerBg.css('background-image', `url(${song.albumArt})`);
         trackNameEl.text(song.trackName);
         artistNameEl.text(song.artistName);

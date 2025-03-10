@@ -2,7 +2,8 @@
 <html>
 <head>
   <title>song of the day player :3</title>
-  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css
+'>
   
   <!-- CONFIGURATION SECTION -->
   <script>
@@ -182,12 +183,12 @@
       font-size: 16px;
     }
     
-    /* Lyrics styles - Modified to prevent clipping */
+    /* Updated Lyrics styles */
     .lyrics-container {
       position: absolute;
       top: 0;
       right: 0;
-      width: 65%; /* Reduced from 70% to avoid clipping with controls */
+      width: 60%; /* Reduced width to prevent clipping */
       height: 70%;
       display: flex;
       flex-direction: column;
@@ -197,13 +198,13 @@
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.7s ease-in-out;
-      padding: 0 70px 0 0; /* Increased right padding to move lyrics further from UI elements */
+      padding: 0 90px 0 0; /* Increased right padding to move lyrics further from UI elements */
       z-index: 5; /* Lower z-index so UI elements appear above lyrics */
     }
     
     .lyrics-display {
       color: rgba(255, 255, 255, 0.3);
-      font-size: 16px;
+      font-size: 18px; /* Increased from 16px */
       text-align: right;
       transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
       transform: translateY(20px);
@@ -212,20 +213,20 @@
       width: 70%;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin: 3px 0; /* Reduced from 5px to 3px to bring lyrics closer together */
+      margin: 2px 0; /* Reduced from 3px to bring lyrics closer together */
     }
     
     .lyrics-display.active {
       color: rgba(255, 255, 255, 0.95);
       transform: translateY(0);
       opacity: 1;
-      font-size: 18px;
+      font-size: 20px; /* Increased from 18px */
     }
     
     .lyrics-display.next {
-      transform: translateY(15px); /* Reduced from 20px to 15px to bring future lyrics closer to current */
+      transform: translateY(10px); /* Reduced from 15px to bring future lyrics closer to current */
       opacity: 0;
-      font-size: 14px;
+      font-size: 16px; /* Increased from 14px */
       color: rgba(255, 255, 255, 0.5);
       transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
     }
@@ -258,13 +259,13 @@
     }
     
     @keyframes scrollUp {
-      from { transform: translateY(20px); opacity: 0; } /* Reduced from 30px to 20px */
+      from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
     
     @keyframes fadeIn {
-      from { transform: translateY(15px); opacity: 0; } /* Reduced from 20px to 15px */
-      to { transform: translateY(15px); opacity: 0.7; } /* Reduced from 20px to 15px */
+      from { transform: translateY(10px); opacity: 0; } /* Reduced from 15px to 10px */
+      to { transform: translateY(10px); opacity: 0.7; } /* Reduced from 15px to 10px */
     }
     
     .lyrics-animation {
@@ -311,7 +312,8 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js
+"></script>
   <script>
     $(function() {
       // DOM Elements
@@ -445,7 +447,7 @@
       // Initialize Player
       function initPlayer() {
         // Set song details
-        playerBg.css('background-image', `url(${song.albumArt})`);
+        playerBg.css('background-image', url(${song.albumArt}));
         trackNameEl.text(song.trackName);
         artistNameEl.text(song.artistName);
         
@@ -493,7 +495,7 @@
       function formatTime(seconds) {
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        return ${mins}:${secs < 10 ? '0' : ''}${secs};
       }
       
       // Update progress bar
@@ -501,7 +503,7 @@
         const { currentTime, duration } = audio;
         if (duration) {
           const progressPercent = (currentTime / duration) * 100;
-          progressBar.css('width', `${progressPercent}%`);
+          progressBar.css('width', ${progressPercent}%);
           currentTimeEl.text(formatTime(currentTime));
         }
       }

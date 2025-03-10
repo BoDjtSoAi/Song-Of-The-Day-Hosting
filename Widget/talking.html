@@ -133,6 +133,7 @@
       background: rgba(255, 255, 255, 0.2);
       cursor: pointer;
       position: relative;
+      z-index: 5; /* Make progress bar visible */
     }
     
     .progress {
@@ -254,16 +255,7 @@
       overflow: visible;
     }
     
-    .lyrics-display.next::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 30%;
-      height: 100%;
-      background: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.8));
-      z-index: 2;
-    }
+    /* Removed the fade effect that was a gradient, per your request */
     
     .lyrics-display.next.visible {
       opacity: 0.7;
@@ -279,6 +271,7 @@
       cursor: pointer;
       transition: background 0.2s ease;
       z-index: 10;
+      display: none; /* Initially hidden, will show if lyrics available */
     }
     
     .lyrics-toggle:hover {
@@ -371,6 +364,7 @@
       let lyrics = [];
       let lyricsVisible = false;
       let currentLyricIndex = -1;
+      let lyricsLoaded = false;
       
       // Parse LRC file
       function parseLRC(text) {
@@ -398,14 +392,32 @@
       
       // Load lyrics from LRC file
       function loadLyrics(url) {
+        if (!url) {
+          // If no URL is provided, don't try to load lyrics
+          console.log("No lyrics URL provided");
+          return;
+        }
+        
         fetch(url)
-          .then(response => response.text())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Failed to load lyrics");
+            }
+            return response.text();
+          })
           .then(text => {
             lyrics = parseLRC(text);
             console.log("Lyrics loaded:", lyrics.length, "lines");
+            
+            if (lyrics.length > 0) {
+              lyricsLoaded = true;
+              // Show lyrics toggle button only if lyrics are available
+              lyricsToggle.css('display', 'block');
+            }
           })
           .catch(error => {
             console.error("Error loading lyrics:", error);
+            // Keep lyrics toggle button hidden on error
           });
       }
       
@@ -472,8 +484,10 @@
         // Set audio source
         audio.src = song.trackUrl;
         
-        // Load lyrics
-        loadLyrics(song.lrcUrl);
+        // Load lyrics if URL is provided
+        if (song.lrcUrl) {
+          loadLyrics(song.lrcUrl);
+        }
         
         // Hide lyrics container initially
         lyricsContainer.css('opacity', '0');

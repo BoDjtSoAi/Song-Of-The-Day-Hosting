@@ -1,571 +1,316 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Music Player</title>
-  <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.3.1/css/all.css'>
+  <title>Horizontal Music Player</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>
   
-  <!-- ===== CONFIGURATION SECTION - EDIT THIS PART ONLY ===== -->
+  <!-- CONFIGURATION SECTION -->
   <script>
-    // ADD YOUR SONGS HERE
-    const musicLibrary = [
-      // Example song format - replace with your own songs
-      {
-        id: 1,
-        albumName: "Talking",
-        trackName: "Californian Soil",
-        albumArt: "https://i.scdn.co/image/ab67616d0000b273decc9374b603d2ab6a31491f",
-        trackUrl: "https://github.com/BoDjtSoAi/Song-Of-The-Day-Hosting/raw/f723ce270e3750f14a6daed4e9f4c971a48f5d81/Music/Files/talking.mp3"
-      },
-      // Add more songs as needed following the same format
-    ];
-
-    // Player appearance settings - black and white theme
-    const playerSettings = {
-      backgroundColor: "#000000",      // Background color - black
-      playerAccentColor: "#FFFFFF",    // Seek bar color - white
-      playerTextColor: "#FFFFFF",      // Text color for titles - white
-      playerSubtextColor: "#CCCCCC"    // Text color for subtitles - light gray
+    // Single song configuration
+    const song = {
+      trackName: "Californian Soil",
+      artistName: "London Grammar",
+      albumArt: "https://i.scdn.co/image/ab67616d0000b273decc9374b603d2ab6a31491f",
+      trackUrl: "https://github.com/BoDjtSoAi/Song-Of-The-Day-Hosting/raw/f723ce270e3750f14a6daed4e9f4c971a48f5d81/Music/Files/talking.mp3"
     };
   </script>
-  <!-- ===== END CONFIGURATION SECTION ===== -->
   
   <style>
-    *:focus { outline: none; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Helvetica', 'Arial', sans-serif;
+    }
     
     body {
-      font-family: Helvetica, Arial;
-      margin: 0;
-      background-color: var(--background-color);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
     }
     
-    :root {
-      --background-color: #000000;
-      --player-accent: #FFFFFF;
-      --player-text: #FFFFFF;
-      --player-subtext: #CCCCCC;
-      --player-bg: #111111;
-      --player-controls-bg: #222222;
-    }
-    
-    #app-cover {
-      position: absolute;
-      top: 50%;
-      right: 0;
-      left: 0;
-      width: 380px;
-      height: 80px;
-      margin: -40px auto;
-    }
-    
-    #player {
+    .player-container {
+      width: 500px;
+      height: 100px;
       position: relative;
-      height: 100%;
-      z-index: 3;
-    }
-    
-    #player-track {
-      position: absolute;
-      top: 0;
-      right: 15px;
-      left: 15px;
-      padding: 13px 22px 10px 160px;
-      background-color: var(--player-bg);
-      border-radius: 15px 15px 0 0;
-      transition: 0.3s ease top;
-      z-index: 1;
-    }
-    
-    #player-track.active {
-      top: -80px;
-    }
-    
-    #album-name {
-      color: var(--player-text);
-      font-size: 16px;
-      font-weight: bold;
-    }
-    
-    #track-name {
-      color: var(--player-subtext);
-      font-size: 12px;
-      margin: 2px 0 13px 0;
-    }
-    
-    #track-time {
-      height: 12px;
-      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     }
     
-    #current-time { float: left; }
-    #track-length { float: right; }
-    
-    #current-time, #track-length {
-      color: transparent;
-      font-size: 11px;
-      background-color: #333333;
-      border-radius: 10px;
-      transition: 0.3s ease all;
-    }
-    
-    #track-time.active #current-time, 
-    #track-time.active #track-length {
-      color: var(--player-accent);
-      background-color: transparent;
-    }
-    
-    #s-area, #seek-bar {
-      position: relative;
-      height: 4px;
-      border-radius: 4px;
-    }
-    
-    #s-area {
-      background-color: #333333;
-      cursor: pointer;
-    }
-    
-    #ins-time {
-      position: absolute;
-      top: -29px;
-      color: #fff;
-      font-size: 12px;
-      white-space: pre;
-      padding: 5px 6px;
-      border-radius: 4px;
-      display: none;
-    }
-    
-    #s-hover {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      opacity: 0.2;
-      z-index: 2;
-    }
-    
-    #ins-time, #s-hover { background-color: #555555; }
-    
-    #seek-bar {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      background-color: var(--player-accent);
-      transition: 0.2s ease width;
-      z-index: 1;
-    }
-    
-    #player-content {
-      position: relative;
-      height: 100%;
-      background-color: var(--player-controls-bg);
-      border-radius: 15px;
-      z-index: 2;
-    }
-    
-    #album-art {
-      position: absolute;
-      top: -30px;
-      width: 90px;
-      height: 90px;
-      margin-left: 40px;
-      border-radius: 50%;
-      overflow: hidden;
-    }
-    
-    #album-art.active {
-      top: -40px;
-    }
-    
-    #album-art img {
-      display: block;
+    .player-bg {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      opacity: 0;
+      background-size: cover;
+      background-position: center;
+      filter: blur(20px);
+      opacity: 0.6;
+      transform: scale(1.1);
       z-index: -1;
     }
     
-    #album-art img.active {
-      opacity: 1;
-      z-index: 1;
-    }
-    
-    #buffer-box {
+    .player-bg::after {
+      content: '';
       position: absolute;
-      top: 50%;
-      right: 0;
+      top: 0;
       left: 0;
-      height: 13px;
-      color: #FFFFFF;
-      font-size: 13px;
-      font-family: Helvetica;
-      text-align: center;
-      font-weight: bold;
-      line-height: 1;
-      padding: 6px;
-      margin: -12px auto 0 auto;
-      background-color: rgba(255, 255, 255, 0.1);
-      opacity: 0;
-      z-index: 2;
-    }
-    
-    #album-art img, #buffer-box { transition: 0.1s linear all; }
-    
-    #album-art.buffering img { opacity: 0.25; }
-    
-    #album-art.buffering img.active {
-      opacity: 0.8;
-      filter: blur(2px);
-      -webkit-filter: blur(2px);
-    }
-    
-    #album-art.buffering #buffer-box { opacity: 1; }
-    
-    #player-controls {
-      width: 200px;
+      width: 100%;
       height: 100%;
-      margin: 0 5px 0 140px;
-      float: right;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    
+    .album-art {
+      width: 80px;
+      height: 80px;
+      margin-left: 10px;
+      border-radius: 10px;
       overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
     }
     
-    .control {
-      width: 33.333%;
-      float: left;
-      padding: 12px 0;
+    .album-art:hover {
+      transform: scale(1.05);
     }
     
-    .button {
-      width: 26px;
-      height: 26px;
-      padding: 18px;
-      background-color: transparent;
-      border-radius: 6px;
+    .album-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .player-controls {
+      flex-grow: 1;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .track-info {
+      margin-bottom: 10px;
+    }
+    
+    .track-name {
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+    
+    .artist-name {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+    }
+    
+    .progress-container {
+      width: 100%;
+      position: relative;
+    }
+    
+    .progress-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.2);
       cursor: pointer;
+      position: relative;
     }
     
-    .button i {
-      display: block;
-      color: var(--player-subtext);
-      font-size: 22px;
-      text-align: center;
-      line-height: 1;
+    .progress {
+      height: 100%;
+      border-radius: 2px;
+      background: white;
+      width: 0;
+      position: relative;
+      transition: width 0.1s linear;
     }
     
-    .button, .button i { transition: 0.2s ease all; }
+    .progress::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: white;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
     
-    .button:hover { background-color: #333333; }
-    .button:hover i { color: var(--player-accent); }
+    .progress-bar:hover .progress::after {
+      opacity: 1;
+    }
+    
+    .time-info {
+      display: flex;
+      justify-content: space-between;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    
+    .play-button {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    
+    .play-button:hover {
+      transform: scale(1.05);
+      background: white;
+    }
+    
+    .play-button i {
+      color: #000;
+      font-size: 16px;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .playing .album-art {
+      animation: pulse 2s infinite;
+    }
   </style>
 </head>
 <body>
-  <div id="app-cover">
-    <div id="player">
-      <div id="player-track">
-        <div id="album-name"></div>
-        <div id="track-name"></div>
-        <div id="track-time">
-          <div id="current-time"></div>
-          <div id="track-length"></div>
-        </div>
-        <div id="s-area">
-          <div id="ins-time"></div>
-          <div id="s-hover"></div>
-          <div id="seek-bar"></div>
-        </div>
+  <div class="player-container">
+    <div class="player-bg"></div>
+    <div class="album-art">
+      <img src="" alt="Album Art">
+    </div>
+    <div class="player-controls">
+      <div class="track-info">
+        <div class="track-name"></div>
+        <div class="artist-name"></div>
       </div>
-      <div id="player-content">
-        <div id="album-art">
-          <div id="buffer-box">Buffering...</div>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress"></div>
         </div>
-        <div id="player-controls">
-          <div class="control">
-            <div class="button" id="play-previous">
-              <i class="fas fa-backward"></i>
-            </div>
-          </div>
-          <div class="control">
-            <div class="button" id="play-pause-button">
-              <i class="fas fa-play"></i>
-            </div>
-          </div>
-          <div class="control">
-            <div class="button" id="play-next">
-              <i class="fas fa-forward"></i>
-            </div>
-          </div>
+        <div class="time-info">
+          <span class="current-time">0:00</span>
+          <span class="duration">0:00</span>
         </div>
       </div>
     </div>
+    <div class="play-button">
+      <i class="fa-solid fa-play"></i>
+    </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script>
     $(function() {
-      // Apply custom settings from configuration
-      document.documentElement.style.setProperty('--background-color', playerSettings.backgroundColor);
-      document.documentElement.style.setProperty('--player-accent', playerSettings.playerAccentColor);
-      document.documentElement.style.setProperty('--player-text', playerSettings.playerTextColor);
-      document.documentElement.style.setProperty('--player-subtext', playerSettings.playerSubtextColor);
+      // DOM Elements
+      const albumArt = $('.album-art img');
+      const playerBg = $('.player-bg');
+      const trackNameEl = $('.track-name');
+      const artistNameEl = $('.artist-name');
+      const playButton = $('.play-button');
+      const playIcon = $('.play-button i');
+      const progressBar = $('.progress');
+      const progressContainer = $('.progress-bar');
+      const currentTimeEl = $('.current-time');
+      const durationEl = $('.duration');
+      const playerContainer = $('.player-container');
       
-      // Player variables
-      let playerTrack = $("#player-track");
-      let albumName = $('#album-name');
-      let trackName = $('#track-name');
-      let albumArt = $('#album-art');
-      let sArea = $('#s-area');
-      let seekBar = $('#seek-bar');
-      let trackTime = $('#track-time');
-      let insTime = $('#ins-time');
-      let sHover = $('#s-hover');
-      let playPauseButton = $("#play-pause-button");
-      let i = playPauseButton.find('i');
-      let tProgress = $('#current-time');
-      let tTime = $('#track-length');
-      let seekT, seekLoc, seekBarPos, cM, ctMinutes, ctSeconds, curMinutes, curSeconds, durMinutes, durSeconds, playProgress, bTime, nTime = 0;
-      let tFlag = false;
-      let playPreviousTrackButton = $('#play-previous');
-      let playNextTrackButton = $('#play-next');
-      let currIndex = -1;
-      let audio = new Audio();
+      // Audio Element
+      const audio = new Audio();
       
-      // Check if there are songs in the library
-      if (musicLibrary.length === 0) {
-        $('#player-track').html('<div style="text-align: center; padding: 20px;">No songs in library.<br>Add songs to the musicLibrary array in the configuration section.</div>');
-        return;
-      }
-      
-      // Initialize album art images dynamically
-      function initializeAlbumArt() {
-        albumArt.empty();
-        albumArt.append('<div id="buffer-box">Buffering...</div>');
-        
-        musicLibrary.forEach((song, index) => {
-          let imgElement = $('<img>', {
-            src: song.albumArt,
-            id: `_${song.id}`,
-            class: index === 0 ? 'active' : ''
-          });
-          albumArt.append(imgElement);
-        });
-      }
-
-      function playPause() {
-        setTimeout(function() {
-          if(audio.paused) {
-            playerTrack.addClass('active');
-            albumArt.addClass('active');
-            i.attr('class','fas fa-pause');
-            audio.play();
-          } else {
-            playerTrack.removeClass('active');
-            albumArt.removeClass('active');
-            albumArt.removeClass('buffering');
-            i.attr('class','fas fa-play');
-            audio.pause();
-          }
-        }, 300);
-      }
-
-      function showHover(event) {
-        seekBarPos = sArea.offset(); 
-        seekT = event.clientX - seekBarPos.left;
-        seekLoc = audio.duration * (seekT / sArea.outerWidth());
-        
-        sHover.width(seekT);
-        
-        cM = seekLoc / 60;
-        
-        ctMinutes = Math.floor(cM);
-        ctSeconds = Math.floor(seekLoc - ctMinutes * 60);
-        
-        if((ctMinutes < 0) || (ctSeconds < 0))
-          return;
-        
-        if(ctMinutes < 10)
-          ctMinutes = '0'+ctMinutes;
-        if(ctSeconds < 10)
-          ctSeconds = '0'+ctSeconds;
-        
-        if(isNaN(ctMinutes) || isNaN(ctSeconds))
-          insTime.text('--:--');
-        else
-          insTime.text(ctMinutes+':'+ctSeconds);
-        
-        insTime.css({'left':seekT,'margin-left':'-21px'}).fadeIn(0);
-      }
-
-      function hideHover() {
-        sHover.width(0);
-        insTime.text('00:00').css({'left':'0px','margin-left':'0px'}).fadeOut(0);
-      }
-    
-      function playFromClickedPos() {
-        audio.currentTime = seekLoc;
-        seekBar.width(seekT);
-        hideHover();
-      }
-
-      function updateCurrTime() {
-        nTime = new Date();
-        nTime = nTime.getTime();
-
-        if(!tFlag) {
-          tFlag = true;
-          trackTime.addClass('active');
-        }
-
-        curMinutes = Math.floor(audio.currentTime / 60);
-        curSeconds = Math.floor(audio.currentTime - curMinutes * 60);
-        
-        durMinutes = Math.floor(audio.duration / 60);
-        durSeconds = Math.floor(audio.duration - durMinutes * 60);
-        
-        playProgress = (audio.currentTime / audio.duration) * 100;
-        
-        if(curMinutes < 10)
-          curMinutes = '0'+curMinutes;
-        if(curSeconds < 10)
-          curSeconds = '0'+curSeconds;
-        
-        if(durMinutes < 10)
-          durMinutes = '0'+durMinutes;
-        if(durSeconds < 10)
-          durSeconds = '0'+durSeconds;
-        
-        if(isNaN(curMinutes) || isNaN(curSeconds))
-          tProgress.text('00:00');
-        else
-          tProgress.text(curMinutes+':'+curSeconds);
-        
-        if(isNaN(durMinutes) || isNaN(durSeconds))
-          tTime.text('00:00');
-        else
-          tTime.text(durMinutes+':'+durSeconds);
-        
-        if(isNaN(curMinutes) || isNaN(curSeconds) || isNaN(durMinutes) || isNaN(durSeconds))
-          trackTime.removeClass('active');
-        else
-          trackTime.addClass('active');
-        
-        seekBar.width(playProgress+'%');
-        
-        if(playProgress == 100) {
-          i.attr('class','fas fa-play');
-          seekBar.width(0);
-          tProgress.text('00:00');
-          albumArt.removeClass('buffering').removeClass('active');
-          selectTrack(1); // Auto play next track
-        }
-      }
-    
-      function selectTrack(flag) {
-        if(flag == 0 || flag == 1)
-          ++currIndex;
-        else
-          --currIndex;
-
-        if(currIndex < 0) currIndex = musicLibrary.length - 1;
-        if(currIndex >= musicLibrary.length) currIndex = 0;
-
-        if((currIndex > -1) && (currIndex < musicLibrary.length)) {
-          if(flag == 0)
-            i.attr('class','fas fa-play');
-          else {
-            albumArt.removeClass('buffering');
-            i.attr('class','fas fa-pause');
-          }
-
-          seekBar.width(0);
-          trackTime.removeClass('active');
-          tProgress.text('00:00');
-          tTime.text('00:00');
-
-          let currentSong = musicLibrary[currIndex];
-          
-          audio.src = currentSong.trackUrl;
-          
-          nTime = 0;
-          bTime = new Date();
-          bTime = bTime.getTime();
-
-          if(flag != 0) {
-            audio.play();
-            playerTrack.addClass('active');
-            albumArt.addClass('active');
-          
-            audio.addEventListener('canplay', function() {
-              albumArt.removeClass('buffering');
-            });
-            
-            audio.addEventListener('waiting', function() {
-              albumArt.addClass('buffering');
-            });
-          }
-
-          albumName.text(currentSong.albumName);
-          trackName.text(currentSong.trackName);
-          
-          // Update album art
-          albumArt.find('img.active').removeClass('active');
-          $(`#_${currentSong.id}`).addClass('active');
-        }
-      }
-
+      // Initialize Player
       function initPlayer() {
-        // Initialize album art images
-        initializeAlbumArt();
+        // Set song details
+        albumArt.attr('src', song.albumArt);
+        playerBg.css('background-image', `url(${song.albumArt})`);
+        trackNameEl.text(song.trackName);
+        artistNameEl.text(song.artistName);
         
-        // Set up player
-        audio.loop = false;
+        // Set audio source
+        audio.src = song.trackUrl;
         
-        playPauseButton.on('click', playPause);
-        
-        sArea.mousemove(function(event) { showHover(event); });
-        sArea.mouseout(hideHover);
-        sArea.on('click', playFromClickedPos);
-                
-        $(audio).on('timeupdate', updateCurrTime);
-
-        playPreviousTrackButton.on('click', function() { selectTrack(-1); });
-        playNextTrackButton.on('click', function() { selectTrack(1); });
-        
-        // Add event listeners for buffering state
-        audio.addEventListener('loadstart', function() {
-          albumArt.addClass('buffering');
+        // Load audio metadata
+        audio.addEventListener('loadedmetadata', function() {
+          const duration = formatTime(audio.duration);
+          durationEl.text(duration);
         });
         
-        audio.addEventListener('canplay', function() {
-          albumArt.removeClass('buffering');
+        // Update progress
+        audio.addEventListener('timeupdate', updateProgress);
+        
+        // Handle audio end
+        audio.addEventListener('ended', () => {
+          playIcon.removeClass('fa-pause').addClass('fa-play');
+          playerContainer.removeClass('playing');
+          progressBar.css('width', '0%');
         });
         
-        audio.addEventListener('waiting', function() {
-          albumArt.addClass('buffering');
-        });
+        // Play/Pause button
+        playButton.on('click', togglePlay);
         
-        audio.addEventListener('playing', function() {
-          albumArt.removeClass('buffering');
-        });
-        
-        audio.addEventListener('error', function() {
-          console.error('Error loading audio file');
-          albumArt.removeClass('buffering');
-        });
-        
-        // Start with first track
-        if (musicLibrary.length > 0) {
-          selectTrack(0);
+        // Click on progress bar
+        progressContainer.on('click', setProgress);
+      }
+      
+      // Format time in MM:SS
+      function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      }
+      
+      // Update progress bar
+      function updateProgress() {
+        const { currentTime, duration } = audio;
+        if (duration) {
+          const progressPercent = (currentTime / duration) * 100;
+          progressBar.css('width', `${progressPercent}%`);
+          currentTimeEl.text(formatTime(currentTime));
         }
       }
       
-      // Initialize player
+      // Play or pause song
+      function togglePlay() {
+        if (audio.paused) {
+          audio.play();
+          playIcon.removeClass('fa-play').addClass('fa-pause');
+          playerContainer.addClass('playing');
+        } else {
+          audio.pause();
+          playIcon.removeClass('fa-pause').addClass('fa-play');
+          playerContainer.removeClass('playing');
+        }
+      }
+      
+      // Set progress when clicked
+      function setProgress(e) {
+        const width = $(this).width();
+        const clickX = e.offsetX;
+        const duration = audio.duration;
+        audio.currentTime = (clickX / width) * duration;
+      }
+      
+      // Initialize
       initPlayer();
     });
   </script>

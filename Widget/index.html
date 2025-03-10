@@ -11,20 +11,20 @@
       // Example song format - replace with your own songs
       {
         id: 1,
-        albumName: "Californian Soil",
-        trackName: "Talking",
+        albumName: "Talking",
+        trackName: "Californian Soil",
         albumArt: "https://i.scdn.co/image/ab67616d0000b273decc9374b603d2ab6a31491f",
         trackUrl: "https://github.com/BoDjtSoAi/Song-Of-The-Day-Hosting/raw/f723ce270e3750f14a6daed4e9f4c971a48f5d81/Music/Files/talking.mp3"
       },
       // Add more songs as needed following the same format
     ];
 
-    // Player appearance settings - customize as needed
+    // Player appearance settings - dark theme
     const playerSettings = {
-      backgroundColor: "#ffeff5",      // Background color
-      playerAccentColor: "#fd6d94",    // Seek bar color
-      playerTextColor: "#54576f",      // Text color for titles
-      playerSubtextColor: "#acaebd"    // Text color for subtitles
+      backgroundColor: "#121212",      // Background color - dark
+      playerAccentColor: "#1DB954",    // Seek bar color - spotify green
+      playerTextColor: "#FFFFFF",      // Text color for titles - white
+      playerSubtextColor: "#B3B3B3"    // Text color for subtitles - light gray
     };
   </script>
   <!-- ===== END CONFIGURATION SECTION ===== -->
@@ -39,10 +39,12 @@
     }
     
     :root {
-      --background-color: #ffeff5;
-      --player-accent: #fd6d94;
-      --player-text: #54576f;
-      --player-subtext: #acaebd;
+      --background-color: #121212;
+      --player-accent: #1DB954;
+      --player-text: #FFFFFF;
+      --player-subtext: #B3B3B3;
+      --player-bg: #181818;
+      --player-controls-bg: #282828;
     }
     
     #app-cover {
@@ -53,32 +55,6 @@
       width: 430px;
       height: 100px;
       margin: -4px auto;
-    }
-    
-    #bg-artwork {
-      position: fixed;
-      top: -30px;
-      right: -30px;
-      bottom: -30px;
-      left: -30px;
-      background-color: #fff;
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-position: 50%;
-      filter: blur(40px);
-      -webkit-filter: blur(40px);
-      z-index: 1;
-    }
-    
-    #bg-layer {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      background-color: #fff;
-      opacity: 0.51;
-      z-index: 2;
     }
     
     #player {
@@ -93,7 +69,7 @@
       right: 15px;
       left: 15px;
       padding: 13px 22px 10px 184px;
-      background-color: #fff7f7;
+      background-color: var(--player-bg);
       border-radius: 15px 15px 0 0;
       transition: 0.3s ease top;
       z-index: 1;
@@ -127,7 +103,7 @@
     #current-time, #track-length {
       color: transparent;
       font-size: 11px;
-      background-color: #ffe8ee;
+      background-color: #333333;
       border-radius: 10px;
       transition: 0.3s ease all;
     }
@@ -145,7 +121,7 @@
     }
     
     #s-area {
-      background-color: #ffe8ee;
+      background-color: #333333;
       cursor: pointer;
     }
     
@@ -186,8 +162,8 @@
     #player-content {
       position: relative;
       height: 100%;
-      background-color: #fff;
-      box-shadow: 0 1px 5px #cecece;
+      background-color: var(--player-controls-bg);
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
       border-radius: 15px;
       z-index: 2;
     }
@@ -200,14 +176,14 @@
       margin-left: 40px;
       transform: rotateZ(0);
       transition: 0.3s ease all;
-      box-shadow: 0 0 0 10px #fff;
+      box-shadow: 0 0 0 10px var(--player-controls-bg);
       border-radius: 50%;
       overflow: hidden;
     }
     
     #album-art.active {
       top: -60px;
-      box-shadow: 0 0 0 4px #fff7f7, 0 30px 50px -15px #afb7c1;
+      box-shadow: 0 0 0 4px var(--player-bg), 0 30px 50px -15px #000000;
     }
     
     #album-art:before {
@@ -219,9 +195,9 @@
       width: 20px;
       height: 20px;
       margin: -10px auto 0 auto;
-      background-color: #d6dee7;
+      background-color: #333333;
       border-radius: 50%;
-      box-shadow: inset 0 0 0 2px #fff;
+      box-shadow: inset 0 0 0 2px var(--player-controls-bg);
       z-index: 2;
     }
     
@@ -257,7 +233,7 @@
       right: 0;
       left: 0;
       height: 13px;
-      color: #1f1f1f;
+      color: #FFFFFF;
       font-size: 13px;
       font-family: Helvetica;
       text-align: center;
@@ -265,7 +241,7 @@
       line-height: 1;
       padding: 6px;
       margin: -12px auto 0 auto;
-      background-color: rgba(255, 255, 255, 0.19);
+      background-color: rgba(255, 255, 255, 0.1);
       opacity: 0;
       z-index: 2;
     }
@@ -300,14 +276,14 @@
       width: 26px;
       height: 26px;
       padding: 25px;
-      background-color: #fff;
+      background-color: var(--player-controls-bg);
       border-radius: 6px;
       cursor: pointer;
     }
     
     .button i {
       display: block;
-      color: #d6dee7;
+      color: var(--player-subtext);
       font-size: 26px;
       text-align: center;
       line-height: 1;
@@ -315,14 +291,12 @@
     
     .button, .button i { transition: 0.2s ease all; }
     
-    .button:hover { background-color: #d6d6de; }
-    .button:hover i { color: #fff; }
+    .button:hover { background-color: #333333; }
+    .button:hover i { color: var(--player-accent); }
   </style>
 </head>
 <body>
   <div id="app-cover">
-    <div id="bg-artwork"></div>
-    <div id="bg-layer"></div>
     <div id="player">
       <div id="player-track">
         <div id="album-name"></div>
@@ -373,8 +347,6 @@
       
       // Player variables
       let playerTrack = $("#player-track");
-      let bgArtwork = $('#bg-artwork');
-      let bgArtworkUrl;
       let albumName = $('#album-name');
       let trackName = $('#track-name');
       let albumArt = $('#album-art');
@@ -577,10 +549,6 @@
           // Update album art
           albumArt.find('img.active').removeClass('active');
           $(`#_${currentSong.id}`).addClass('active');
-          
-          // Update background artwork
-          bgArtworkUrl = currentSong.albumArt;
-          bgArtwork.css({'background-image': `url(${bgArtworkUrl})`});
         }
       }
 

@@ -34,18 +34,13 @@
     
     .player-container {
       width: 100%;
-      height: 100px;
+      height: 160px; /* Always full-size (previously was the "lyrics on" state) */
       position: relative;
       display: flex;
       align-items: center;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      transition: height 0.5s ease;
-    }
-    
-    .player-container.lyrics-visible {
-      height: 160px;
     }
     
     .player-bg {
@@ -79,13 +74,10 @@
       flex-direction: column;
       position: relative;
       height: 100%;
-      justify-content: space-between;
-      transition: transform 0.5s ease, padding-bottom 0.5s ease;
-    }
-    
-    .lyrics-visible .player-controls {
-      transform: translateY(calc(100% - 70px));
+      justify-content: flex-end;
       padding-bottom: 15px;
+      /* Always positioned at the bottom */
+      transform: translateY(calc(100% - 70px));
     }
     
     .track-info {
@@ -93,10 +85,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: opacity 0.7s ease;
-    }
-    
-    .lyrics-visible .track-info {
       opacity: 0.8;
     }
     
@@ -115,11 +103,9 @@
     .progress-wrapper {
       width: 100%;
       margin-bottom: 10px;
-      transition: opacity 0.7s ease;
-    }
-    
-    .lyrics-visible .progress-wrapper {
       opacity: 0.8;
+      position: relative;
+      z-index: 10; /* Ensure it's above other elements */
     }
     
     .progress-container {
@@ -133,7 +119,7 @@
       background: rgba(255, 255, 255, 0.2);
       cursor: pointer;
       position: relative;
-      z-index: 5; /* Make progress bar visible */
+      z-index: 10; /* Make progress bar visible */
     }
     
     .progress {
@@ -182,23 +168,16 @@
       align-items: center;
       cursor: pointer;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s ease, background 0.2s ease, opacity 0.7s ease, margin-top 0.5s ease;
+      transition: transform 0.2s ease, background 0.2s ease;
       z-index: 10;
-    }
-    
-    .lyrics-visible .play-button {
+      transform: translateY(calc(100% - 70px)); /* Always positioned like lyrics mode */
       opacity: 0.8;
-      transform: translateY(calc(100% - 70px));
     }
     
     .play-button:hover {
-      transform: scale(1.05);
+      transform: scale(1.05) translateY(calc(100% - 70px));
       background: white;
       opacity: 1;
-    }
-    
-    .lyrics-visible .play-button:hover {
-      transform: scale(1.05) translateY(calc(100% - 70px));
     }
     
     .play-button i {
@@ -210,29 +189,29 @@
     .lyrics-container {
       position: absolute;
       top: 0;
-      left: 0;
-      width: 100%;
+      right: 0; /* Aligned to the right */
+      width: 70%; /* Take up 70% of the container width */
       height: 70%;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-end; /* Align to the right */
       justify-content: center;
       pointer-events: none;
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.7s ease-in-out;
-      padding: 0 60px;
+      padding: 0 60px 0 0; /* Padding on the right side */
     }
     
     .lyrics-display {
       color: rgba(255, 255, 255, 0.3);
       font-size: 16px;
-      text-align: center;
+      text-align: right; /* Right-aligned text */
       transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
-      transform: translateY(100px);
+      transform: translateY(20px);
       opacity: 0;
       font-weight: bold;
-      width: 100%;
+      width: 70%; /* Width of lyrics text */
       overflow: hidden;
       text-overflow: ellipsis;
       margin: 5px 0;
@@ -246,16 +225,12 @@
     }
     
     .lyrics-display.next {
-      transform: translateY(30px);
+      transform: translateY(20px);
       opacity: 0;
       font-size: 14px;
       color: rgba(255, 255, 255, 0.5);
-      transition: transform 1s ease, opacity 1s ease, color 1s ease;
-      position: relative;
-      overflow: visible;
+      transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
     }
-    
-    /* Removed the fade effect that was a gradient, per your request */
     
     .lyrics-display.next.visible {
       opacity: 0.7;
@@ -283,23 +258,23 @@
       color: black;
     }
     
-    /* Animation for lyrics transition */
-    @keyframes slideIn {
-      from { transform: translateY(20px); opacity: 0; }
+    /* Animation for lyrics transition - simplified vertical scroll */
+    @keyframes scrollUp {
+      from { transform: translateY(30px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
     
     @keyframes fadeIn {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(30px); opacity: 0.7; }
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(20px); opacity: 0.7; }
     }
     
     .lyrics-animation {
-      animation: slideIn 0.8s ease forwards;
+      animation: scrollUp 0.8s ease forwards;
     }
     
     .future-lyrics-animation {
-      animation: fadeIn 1s ease forwards;
+      animation: fadeIn 0.8s ease forwards;
     }
   </style>
 </head>
@@ -466,11 +441,9 @@
         if (lyricsVisible) {
           lyricsContainer.css('opacity', '1');
           lyricsToggle.addClass('active');
-          playerContainer.addClass('lyrics-visible');
         } else {
           lyricsContainer.css('opacity', '0');
           lyricsToggle.removeClass('active');
-          playerContainer.removeClass('lyrics-visible');
         }
       }
       

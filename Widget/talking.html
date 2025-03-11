@@ -190,90 +190,54 @@
       font-size: 16px;
     }
     
-    /* Updated Lyrics styles - improved positioning and animations */
+    /* Updated Lyrics styles - positioned to align with lyrics button */
     .lyrics-container {
       position: absolute;
-      top: 0;
-      right: 80px; /* Positioned further to the right */
-      width: 65%; /* Slightly wider */
-      height: 100%;
+      top: 15px; /* Align with the lyrics button */
+      right: 90px; /* Moved further right */
+      width: 60%;
+      height: 60px; /* Limited height for 2 lines */
       display: flex;
       flex-direction: column;
       align-items: flex-end; /* Right alignment */
-      justify-content: center;
+      justify-content: flex-start;
       pointer-events: none;
-      overflow: visible;
-      transition: opacity 1s ease-in-out;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.7s ease-in-out;
       padding: 0 20px 0 0; /* Padding on the right */
       z-index: 5;
-      opacity: 0; /* Start hidden */
     }
     
-    /* Improved smooth scrolling animation */
-    @keyframes smoothFadeInOut {
-      0% {
-        transform: translateX(-10px);
-        opacity: 0;
-      }
-      10% {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      90% {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      100% {
-        transform: translateX(10px);
-        opacity: 0;
-      }
+    /* Simple smooth scrolling animation */
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
     
     .lyrics-display {
-      color: rgba(255, 255, 255, 0.3);
-      font-size: 18px;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 20px;
       text-align: right;
-      opacity: 0;
-      transform: translateY(0);
       font-weight: bold;
       width: 100%;
-      overflow: visible;
       white-space: nowrap;
       margin: 4px 0;
-      position: relative;
-      transition: all 0.6s ease-in-out;
+      transition: all 0.5s ease;
     }
     
     .lyrics-display.active {
-      color: rgba(255, 255, 255, 0.95);
       opacity: 1;
-      font-size: 20px;
-      animation: smoothFadeInOut 4s ease-in-out;
+      animation: slideUp 0.5s ease forwards;
       text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
     }
     
     .lyrics-display.next {
-      opacity: 0;
+      opacity: 0.6;
       font-size: 16px;
-      color: rgba(255, 255, 255, 0.5);
-      transition: all 0.6s ease-in-out;
-      transform: translateY(0);
-    }
-    
-    .lyrics-display.next.visible {
-      opacity: 0.7;
-    }
-    
-    .lyrics-display.prev {
-      opacity: 0;
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.5);
-      transition: all 0.6s ease-in-out;
-      transform: translateY(0);
-    }
-    
-    .lyrics-display.prev.visible {
-      opacity: 0.3;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 5px;
+      /* No animation initially, will slide up when becoming active */
     }
     
     .lyrics-toggle {
@@ -287,7 +251,6 @@
       transition: background 0.2s ease;
       z-index: 15;
       display: none; /* Hidden by default, shown if lyrics available */
-      position: relative;
     }
     
     .lyrics-toggle:hover {
@@ -326,7 +289,6 @@
     </div>
     
     <div class="lyrics-container">
-      <div class="lyrics-display prev"></div>
       <div class="lyrics-display active"></div>
       <div class="lyrics-display next"></div>
     </div>
@@ -354,7 +316,6 @@
       const lyricsContainer = $('.lyrics-container');
       const lyricsCurrent = $('.lyrics-display.active');
       const lyricsNext = $('.lyrics-display.next');
-      const lyricsPrev = $('.lyrics-display.prev');
       
       // Audio Element
       const audio = new Audio();
@@ -409,10 +370,11 @@
             
             if (lyrics.length > 0) {
               lyricsLoaded = true;
+              lyricsToggle.css('display', 'block');
               // Auto show lyrics if available
               lyricsVisible = true;
               lyricsContainer.css('opacity', '1');
-              lyricsToggle.addClass('active').css('display', 'block');
+              lyricsToggle.addClass('active');
             }
           })
           .catch(error => {
@@ -432,39 +394,19 @@
         if (index !== currentLyricIndex && index >= 0) {
           currentLyricIndex = index;
           
-          // Get previous, current and next lyrics
-          const prevText = index > 0 ? lyrics[index - 1]?.text || "" : "";
+          // Set current and next lyrics
           const currentText = lyrics[index]?.text || "";
           const nextText = index < lyrics.length - 1 ? lyrics[index + 1]?.text || "" : "";
           
-          // Apply smooth transitions
-          // First clear all classes
-          lyricsPrev.removeClass('visible');
-          lyricsCurrent.css('animation', 'none');
-          lyricsNext.removeClass('visible');
+          // Smoothly update texts without sudden appearances
+          // First set the next lyric
+          lyricsNext.text(nextText);
           
-          // Set the text content
-          setTimeout(() => {
-            lyricsPrev.text(prevText);
-            lyricsCurrent.text(currentText);
-            lyricsNext.text(nextText);
-            
-            // Then reapply animations with a slight delay
-            setTimeout(() => {
-              // Restart the animation
-              void lyricsCurrent[0].offsetWidth; // Trigger reflow
-              lyricsCurrent.css('animation', 'smoothFadeInOut 4s ease-in-out');
-              
-              // Show previous and next with smooth fade in
-              if (prevText) {
-                lyricsPrev.addClass('visible');
-              }
-              
-              if (nextText) {
-                lyricsNext.addClass('visible');
-              }
-            }, 50);
-          }, 50);
+          // Then update the current lyric with animation reset
+          lyricsCurrent.css('animation', 'none');
+          void lyricsCurrent[0].offsetWidth; // Trigger reflow
+          lyricsCurrent.text(currentText);
+          lyricsCurrent.css('animation', 'slideUp 0.5s ease forwards');
         }
       }
       
@@ -494,6 +436,9 @@
         if (song.lrcUrl) {
           loadLyrics(song.lrcUrl);
         }
+        
+        // Hide lyrics container initially
+        lyricsContainer.css('opacity', '0');
         
         // Load audio metadata
         audio.addEventListener('loadedmetadata', function() {

@@ -190,44 +190,67 @@
       font-size: 16px;
     }
     
-    /* Updated Lyrics styles - moved to the left */
+    /* Updated Lyrics styles - moved to the middle-right */
     .lyrics-container {
       position: absolute;
       top: 0;
-      left: 10px; /* Moved to the left side instead of right */
+      right: 70px; /* Positioned to the right */
       width: 60%;
       height: 70%;
       display: flex;
       flex-direction: column;
-      align-items: flex-start; /* Left alignment instead of flex-end */
+      align-items: flex-end; /* Right alignment */
       justify-content: center;
       pointer-events: none;
-      overflow: visible; /* Changed from hidden to prevent clipping */
+      overflow: visible;
       opacity: 0;
       transition: opacity 0.7s ease-in-out;
-      padding: 0 0 0 20px; /* Padding on the left now */
+      padding: 0 20px 0 0; /* Padding on the right */
       z-index: 5;
+    }
+    
+    /* Left-to-right lyrics sparkling animation */
+    @keyframes sparkleLeftToRight {
+      0% {
+        background-position: -100% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
     }
     
     .lyrics-display {
       color: rgba(255, 255, 255, 0.3);
       font-size: 18px;
-      text-align: left; /* Changed from right to left */
-      transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
+      text-align: right;
+      transition: transform 0.8s ease, opacity 0.8s ease;
       transform: translateY(20px);
       opacity: 0;
       font-weight: bold;
-      width: 100%; /* Increased from 70% */
-      overflow: visible; /* Changed from hidden to prevent clipping */
-      white-space: nowrap; /* Ensures text doesn't wrap */
+      width: 100%;
+      overflow: visible;
+      white-space: nowrap;
       margin: 2px 0;
+      position: relative;
     }
     
     .lyrics-display.active {
-      color: rgba(255, 255, 255, 0.95);
+      color: transparent;
       transform: translateY(0);
       opacity: 1;
       font-size: 20px;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.3) 0%,
+        rgba(255, 255, 255, 0.95) 30%,
+        rgba(255, 255, 255, 0.95) 70%,
+        rgba(255, 255, 255, 0.3) 100%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: sparkleLeftToRight 4s linear infinite;
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
     }
     
     .lyrics-display.next {
@@ -235,7 +258,7 @@
       opacity: 0;
       font-size: 16px;
       color: rgba(255, 255, 255, 0.5);
-      transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
+      transition: transform 0.8s ease, opacity 0.8s ease;
     }
     
     .lyrics-display.next.visible {

@@ -86,11 +86,19 @@
       opacity: 0.8;
     }
     
+    /* Song title with sparkling animation */
+    @keyframes sparkle {
+      0% { color: rgba(255, 255, 255, 0.8); text-shadow: none; }
+      50% { color: #ffffff; text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 10px rgba(255, 255, 255, 0.5); }
+      100% { color: rgba(255, 255, 255, 0.8); text-shadow: none; }
+    }
+    
     .track-name {
       color: white;
       font-size: 16px;
       font-weight: bold;
       margin-bottom: 3px;
+      animation: sparkle 3s ease-in-out infinite; /* Slow sparkling effect */
     }
     
     .artist-name {
@@ -182,50 +190,50 @@
       font-size: 16px;
     }
     
-    /* Updated Lyrics styles */
+    /* Updated Lyrics styles - moved to the left */
     .lyrics-container {
       position: absolute;
       top: 0;
-      right: 0;
-      width: 60%; /* Reduced width to prevent clipping */
+      left: 10px; /* Moved to the left side instead of right */
+      width: 60%;
       height: 70%;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: flex-start; /* Left alignment instead of flex-end */
       justify-content: center;
       pointer-events: none;
-      overflow: hidden;
+      overflow: visible; /* Changed from hidden to prevent clipping */
       opacity: 0;
       transition: opacity 0.7s ease-in-out;
-      padding: 0 90px 0 0; /* Increased right padding to move lyrics further from UI elements */
-      z-index: 5; /* Lower z-index so UI elements appear above lyrics */
+      padding: 0 0 0 20px; /* Padding on the left now */
+      z-index: 5;
     }
     
     .lyrics-display {
       color: rgba(255, 255, 255, 0.3);
-      font-size: 18px; /* Increased from 16px */
-      text-align: right;
+      font-size: 18px;
+      text-align: left; /* Changed from right to left */
       transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
       transform: translateY(20px);
       opacity: 0;
       font-weight: bold;
-      width: 70%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin: 2px 0; /* Reduced from 3px to bring lyrics closer together */
+      width: 100%; /* Increased from 70% */
+      overflow: visible; /* Changed from hidden to prevent clipping */
+      white-space: nowrap; /* Ensures text doesn't wrap */
+      margin: 2px 0;
     }
     
     .lyrics-display.active {
       color: rgba(255, 255, 255, 0.95);
       transform: translateY(0);
       opacity: 1;
-      font-size: 20px; /* Increased from 18px */
+      font-size: 20px;
     }
     
     .lyrics-display.next {
-      transform: translateY(10px); /* Reduced from 15px to bring future lyrics closer to current */
+      transform: translateY(10px);
       opacity: 0;
-      font-size: 16px; /* Increased from 14px */
+      font-size: 16px;
       color: rgba(255, 255, 255, 0.5);
       transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
     }
@@ -243,9 +251,9 @@
       font-size: 12px;
       cursor: pointer;
       transition: background 0.2s ease;
-      z-index: 15; /* Higher z-index to ensure it's always clickable */
+      z-index: 15;
       display: none;
-      position: relative; /* Added to ensure it stays above lyrics */
+      position: relative;
     }
     
     .lyrics-toggle:hover {
@@ -263,8 +271,8 @@
     }
     
     @keyframes fadeIn {
-      from { transform: translateY(10px); opacity: 0; } /* Reduced from 15px to 10px */
-      to { transform: translateY(10px); opacity: 0.7; } /* Reduced from 15px to 10px */
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(10px); opacity: 0.7; }
     }
     
     .lyrics-animation {
@@ -502,543 +510,6 @@
         if (duration) {
           const progressPercent = (currentTime / duration) * 100;
           progressBar.css('width', `${progressPercent}%`);
-          currentTimeEl.text(formatTime(currentTime));
-        }
-      }
-      
-      // Play or pause song
-      function togglePlay() {
-        if (audio.paused) {
-          audio.play();
-          playIcon.removeClass('fa-play').addClass('fa-pause');
-          playerContainer.addClass('playing');
-        } else {
-          audio.pause();
-          playIcon.removeClass('fa-pause').addClass('fa-play');
-          playerContainer.removeClass('playing');
-        }
-      }
-      
-      // Set progress when clicked
-      function setProgress(e) {
-        const width = $(this).width();
-        const clickX = e.offsetX;
-        const duration = audio.duration;
-        audio.currentTime = (clickX / width) * duration;
-      }
-      
-      // Initialize
-      initPlayer();
-    });
-  </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-  <title>song of the day player :3</title>
-  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css
-'>
-  
-  <!-- CONFIGURATION SECTION -->
-  <script>
-    // Single song configuration
-    const song = {
-      trackName: "Talking",
-      artistName: "London Grammar",
-      albumArt: "https://i.scdn.co/image/ab67616d0000b273decc9374b603d2ab6a31491f",
-      trackUrl: "https://github.com/BoDjtSoAi/Song-Of-The-Day-Hosting/raw/f723ce270e3750f14a6daed4e9f4c971a48f5d81/Music/Files/talking.mp3",
-      lrcUrl: "https://raw.githubusercontent.com/BoDjtSoAi/Song-Of-The-Day-Hosting/refs/heads/main/Lyrics/London%20Grammar%20-%20Talking.lrc"
-    };
-  </script>
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Helvetica', 'Arial', sans-serif;
-    }
-    
-    body {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: transparent;
-    }
-    
-    .player-container {
-      width: 100%;
-      height: 160px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    }
-    
-    .player-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      filter: blur(20px);
-      opacity: 0.6;
-      transform: scale(1.1);
-      z-index: -1;
-    }
-    
-    .player-bg::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-    }
-    
-    .player-controls {
-      flex-grow: 1;
-      padding: 0 20px;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      height: 100%;
-      justify-content: flex-end;
-      padding-bottom: 15px;
-    }
-    
-    .track-info {
-      margin-top: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      opacity: 0.8;
-    }
-    
-    .track-name {
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 3px;
-    }
-    
-    .artist-name {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 14px;
-    }
-    
-    .progress-wrapper {
-      width: 100%;
-      margin-bottom: 10px;
-      opacity: 0.8;
-      position: relative;
-      z-index: 10;
-    }
-    
-    .progress-container {
-      width: 100%;
-      position: relative;
-    }
-    
-    .progress-bar {
-      height: 4px;
-      border-radius: 2px;
-      background: rgba(255, 255, 255, 0.2);
-      cursor: pointer;
-      position: relative;
-      z-index: 10;
-    }
-    
-    .progress {
-      height: 100%;
-      border-radius: 2px;
-      background: white;
-      width: 0;
-      position: relative;
-      transition: width 0.1s linear;
-    }
-    
-    .progress::after {
-      content: '';
-      position: absolute;
-      right: -5px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: white;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    
-    .progress-bar:hover .progress::after {
-      opacity: 1;
-    }
-    
-    .time-info {
-      display: flex;
-      justify-content: space-between;
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 12px;
-      margin-top: 5px;
-    }
-    
-    .play-button {
-      width: 40px;
-      height: 40px;
-      margin-right: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s ease, background 0.2s ease;
-      z-index: 10;
-      opacity: 0.8;
-    }
-    
-    .play-button:hover {
-      transform: scale(1.05);
-      background: white;
-      opacity: 1;
-    }
-    
-    .play-button i {
-      color: #000;
-      font-size: 16px;
-    }
-    
-    /* Updated Lyrics styles */
-    .lyrics-container {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 60%; /* Reduced width to prevent clipping */
-      height: 70%;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      justify-content: center;
-      pointer-events: none;
-      overflow: hidden;
-      opacity: 0;
-      transition: opacity 0.7s ease-in-out;
-      padding: 0 90px 0 0; /* Increased right padding to move lyrics further from UI elements */
-      z-index: 5; /* Lower z-index so UI elements appear above lyrics */
-    }
-    
-    .lyrics-display {
-      color: rgba(255, 255, 255, 0.3);
-      font-size: 18px; /* Increased from 16px */
-      text-align: right;
-      transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
-      transform: translateY(20px);
-      opacity: 0;
-      font-weight: bold;
-      width: 70%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin: 2px 0; /* Reduced from 3px to bring lyrics closer together */
-    }
-    
-    .lyrics-display.active {
-      color: rgba(255, 255, 255, 0.95);
-      transform: translateY(0);
-      opacity: 1;
-      font-size: 20px; /* Increased from 18px */
-    }
-    
-    .lyrics-display.next {
-      transform: translateY(10px); /* Reduced from 15px to bring future lyrics closer to current */
-      opacity: 0;
-      font-size: 16px; /* Increased from 14px */
-      color: rgba(255, 255, 255, 0.5);
-      transition: transform 0.8s ease, opacity 0.8s ease, color 0.8s ease;
-    }
-    
-    .lyrics-display.next.visible {
-      opacity: 0.7;
-    }
-    
-    .lyrics-toggle {
-      background: rgba(255, 255, 255, 0.3);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-      z-index: 15; /* Higher z-index to ensure it's always clickable */
-      display: none;
-      position: relative; /* Added to ensure it stays above lyrics */
-    }
-    
-    .lyrics-toggle:hover {
-      background: rgba(255, 255, 255, 0.5);
-    }
-    
-    .lyrics-toggle.active {
-      background: rgba(255, 255, 255, 0.7);
-      color: black;
-    }
-    
-    @keyframes scrollUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    
-    @keyframes fadeIn {
-      from { transform: translateY(10px); opacity: 0; } /* Reduced from 15px to 10px */
-      to { transform: translateY(10px); opacity: 0.7; } /* Reduced from 15px to 10px */
-    }
-    
-    .lyrics-animation {
-      animation: scrollUp 0.8s ease forwards;
-    }
-    
-    .future-lyrics-animation {
-      animation: fadeIn 0.8s ease forwards;
-    }
-  </style>
-</head>
-<body>
-  <div class="player-container">
-    <div class="player-bg"></div>
-    <div class="player-controls">
-      <div class="track-info">
-        <div>
-          <div class="track-name"></div>
-          <div class="artist-name"></div>
-        </div>
-        <button class="lyrics-toggle">LYRICS</button>
-      </div>
-      
-      <div class="progress-wrapper">
-        <div class="progress-container">
-          <div class="progress-bar">
-            <div class="progress"></div>
-          </div>
-          <div class="time-info">
-            <span class="current-time">0:00</span>
-            <span class="duration">0:00</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="lyrics-container">
-      <div class="lyrics-display active"></div>
-      <div class="lyrics-display next"></div>
-    </div>
-    
-    <div class="play-button">
-      <i class="fa-solid fa-play"></i>
-    </div>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js
-"></script>
-  <script>
-    $(function() {
-      // DOM Elements
-      const playerBg = $('.player-bg');
-      const trackNameEl = $('.track-name');
-      const artistNameEl = $('.artist-name');
-      const playButton = $('.play-button');
-      const playIcon = $('.play-button i');
-      const progressBar = $('.progress');
-      const progressContainer = $('.progress-bar');
-      const currentTimeEl = $('.current-time');
-      const durationEl = $('.duration');
-      const playerContainer = $('.player-container');
-      const lyricsToggle = $('.lyrics-toggle');
-      const lyricsContainer = $('.lyrics-container');
-      const lyricsCurrent = $('.lyrics-display.active');
-      const lyricsNext = $('.lyrics-display.next');
-      
-      // Audio Element
-      const audio = new Audio();
-      
-      // Lyrics variables
-      let lyrics = [];
-      let lyricsVisible = false;
-      let currentLyricIndex = -1;
-      let lyricsLoaded = false;
-      
-      // Parse LRC file
-      function parseLRC(text) {
-        const lines = text.split('\n');
-        const timeRegex = /\[(\d{2}):(\d{2})\.(\d{2})\]/;
-        const result = [];
-        
-        for (const line of lines) {
-          const match = timeRegex.exec(line);
-          if (match) {
-            const minutes = parseInt(match[1]);
-            const seconds = parseInt(match[2]);
-            const hundredths = parseInt(match[3]);
-            const time = minutes * 60 + seconds + hundredths / 100;
-            const text = line.replace(timeRegex, '').trim();
-            
-            if (text) {
-              result.push({ time, text });
-            }
-          }
-        }
-        
-        return result.sort((a, b) => a.time - b.time);
-      }
-      
-      // Load lyrics from LRC file
-      function loadLyrics(url) {
-        if (!url) {
-          console.log("No lyrics URL provided");
-          return;
-        }
-        
-        fetch(url)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error("Failed to load lyrics");
-            }
-            return response.text();
-          })
-          .then(text => {
-            lyrics = parseLRC(text);
-            console.log("Lyrics loaded:", lyrics.length, "lines");
-            
-            if (lyrics.length > 0) {
-              lyricsLoaded = true;
-              lyricsToggle.css('display', 'block');
-            }
-          })
-          .catch(error => {
-            console.error("Error loading lyrics:", error);
-          });
-      }
-      
-      // Update lyrics display based on current time
-      function updateLyrics(currentTime) {
-        if (!lyricsVisible || lyrics.length === 0) return;
-        
-        // Find the current lyric
-        let index = lyrics.findIndex(lyric => lyric.time > currentTime);
-        index = index === -1 ? lyrics.length - 1 : index - 1;
-        
-        // Only update if the lyric changed
-        if (index !== currentLyricIndex && index >= 0) {
-          currentLyricIndex = index;
-          
-          // Set current and next lyrics
-          lyricsCurrent.text(lyrics[index]?.text || "");
-          
-          // Remove any existing classes from next lyric
-          lyricsNext.removeClass('visible future-lyrics-animation');
-          
-          // Set next lyric if available
-          if (index < lyrics.length - 1) {
-            lyricsNext.text(lyrics[index + 1]?.text || "");
-            
-            // Add animation with a slight delay for smoother transition
-            setTimeout(() => {
-              lyricsNext.addClass('future-lyrics-animation');
-              setTimeout(() => {
-                lyricsNext.addClass('visible');
-              }, 100);
-            }, 200);
-          } else {
-            lyricsNext.text("");
-          }
-          
-          // Add animation classes to current lyric
-          lyricsCurrent.removeClass('lyrics-animation').addClass('lyrics-animation');
-          setTimeout(() => lyricsCurrent.removeClass('lyrics-animation'), 800);
-        }
-      }
-      
-      // Toggle lyrics visibility
-      function toggleLyrics() {
-        lyricsVisible = !lyricsVisible;
-        if (lyricsVisible) {
-          lyricsContainer.css('opacity', '1');
-          lyricsToggle.addClass('active');
-        } else {
-          lyricsContainer.css('opacity', '0');
-          lyricsToggle.removeClass('active');
-        }
-      }
-      
-      // Initialize Player
-      function initPlayer() {
-        // Set song details
-        playerBg.css('background-image', url(${song.albumArt}));
-        trackNameEl.text(song.trackName);
-        artistNameEl.text(song.artistName);
-        
-        // Set audio source
-        audio.src = song.trackUrl;
-        
-        // Load lyrics if URL is provided
-        if (song.lrcUrl) {
-          loadLyrics(song.lrcUrl);
-        }
-        
-        // Hide lyrics container initially
-        lyricsContainer.css('opacity', '0');
-        
-        // Load audio metadata
-        audio.addEventListener('loadedmetadata', function() {
-          const duration = formatTime(audio.duration);
-          durationEl.text(duration);
-        });
-        
-        // Update progress and lyrics
-        audio.addEventListener('timeupdate', function() {
-          updateProgress();
-          updateLyrics(audio.currentTime);
-        });
-        
-        // Handle audio end
-        audio.addEventListener('ended', () => {
-          playIcon.removeClass('fa-pause').addClass('fa-play');
-          playerContainer.removeClass('playing');
-          progressBar.css('width', '0%');
-        });
-        
-        // Play/Pause button
-        playButton.on('click', togglePlay);
-        
-        // Click on progress bar
-        progressContainer.on('click', setProgress);
-        
-        // Lyrics toggle button
-        lyricsToggle.on('click', toggleLyrics);
-      }
-      
-      // Format time in MM:SS
-      function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return ${mins}:${secs < 10 ? '0' : ''}${secs};
-      }
-      
-      // Update progress bar
-      function updateProgress() {
-        const { currentTime, duration } = audio;
-        if (duration) {
-          const progressPercent = (currentTime / duration) * 100;
-          progressBar.css('width', ${progressPercent}%);
           currentTimeEl.text(formatTime(currentTime));
         }
       }

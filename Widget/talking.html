@@ -34,7 +34,7 @@
     
     .player-container {
       width: 100%;
-      height: 160px;
+      height: 150px;
       position: relative;
       display: flex;
       align-items: center;
@@ -75,11 +75,11 @@
       position: relative;
       height: 100%;
       justify-content: flex-end;
-      padding-bottom: 15px;
+      padding-bottom: 12px;
     }
     
     .track-info {
-      margin-top: 15px;
+      margin-top: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -93,11 +93,17 @@
       100% { color: rgba(255, 255, 255, 0.8); text-shadow: none; }
     }
     
+    .track-name-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    
     .track-name {
       color: white;
       font-size: 16px;
       font-weight: bold;
-      margin-bottom: 3px;
       animation: sparkle 3s ease-in-out infinite; /* Slow sparkling effect */
     }
     
@@ -108,7 +114,7 @@
     
     .progress-wrapper {
       width: 100%;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       opacity: 0.8;
       position: relative;
       z-index: 10;
@@ -160,12 +166,12 @@
       justify-content: space-between;
       color: rgba(255, 255, 255, 0.7);
       font-size: 12px;
-      margin-top: 5px;
+      margin-top: 3px;
     }
     
     .play-button {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       margin-right: 10px;
       background: rgba(255, 255, 255, 0.9);
       border-radius: 50%;
@@ -190,71 +196,154 @@
       font-size: 16px;
     }
     
-    /* Updated Lyrics styles - positioned to align with lyrics button */
+    /* Audio quality logo and animation */
+    @keyframes pulse {
+      0% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.05); filter: brightness(1.3); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+    
+    @keyframes shine {
+      0% { 
+        background-position: -100px;  
+      }
+      20% {
+        background-position: 200px;
+      }
+      100% {
+        background-position: 200px;
+      }
+    }
+    
+    .audio-quality {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 8px;
+      position: relative;
+    }
+    
+    .audio-format {
+      font-size: 11px;
+      font-weight: bold;
+      border-radius: 4px;
+      padding: 2px 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .lossless-logo {
+      background-color: #1a1a1a;
+      color: #8abfff;
+      background: linear-gradient(135deg, #0f2b4c, #1a4980);
+      border: 1px solid #2a5998;
+    }
+    
+    .lossless-logo.shine {
+      position: relative;
+      animation: pulse 2s infinite ease-in-out;
+    }
+    
+    .lossless-logo.shine::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transform: skewX(-20deg);
+      animation: shine 3s infinite;
+    }
+    
+    .mp3-logo {
+      background-color: #333;
+      color: #ffcc66;
+      border: 1px solid #806633;
+    }
+    
+    .audio-spec {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-left: 6px;
+      font-weight: bold;
+    }
+    
+    /* Lyrics styles */
     .lyrics-container {
       position: absolute;
-      top: 15px; /* Align with the lyrics button */
-      right: 90px; /* Moved further right */
-      width: 60%;
-      height: 60px; /* Limited height for 2 lines */
+      top: 15px;
+      left: 0;
+      width: 100%;
+      height: 55px;
       display: flex;
       flex-direction: column;
-      align-items: flex-end; /* Right alignment */
-      justify-content: flex-start;
+      align-items: flex-start;
+      justify-content: center;
       pointer-events: none;
       overflow: hidden;
       opacity: 0;
-      transition: opacity 0.7s ease-in-out;
-      padding: 0 20px 0 0; /* Padding on the right */
+      transition: opacity 0.3s ease-in-out;
       z-index: 5;
+      padding: 0 45px 0 20px;
     }
     
-    /* Simple smooth scrolling animation */
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     .lyrics-display {
-      color: rgba(255, 255, 255, 0.95);
+      color: white;
       font-size: 20px;
-      text-align: right;
+      text-align: left;
       font-weight: bold;
       width: 100%;
       white-space: nowrap;
-      margin: 4px 0;
-      transition: all 0.5s ease;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 2px 0;
+      transition: all 0.3s ease;
+      opacity: 0;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
     }
     
     .lyrics-display.active {
       opacity: 1;
-      animation: slideUp 0.5s ease forwards;
-      text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+      animation: fadeIn 0.3s ease forwards;
     }
     
     .lyrics-display.next {
-      opacity: 0.6;
+      opacity: 0.7;
       font-size: 16px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-top: 5px;
-      /* No animation initially, will slide up when becoming active */
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: normal;
     }
     
     .lyrics-toggle {
-      background: rgba(255, 255, 255, 0.3);
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.2);
       color: white;
       border: none;
       border-radius: 4px;
       padding: 2px 8px;
       font-size: 12px;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: all 0.2s ease;
       z-index: 15;
-      display: none; /* Hidden by default, shown if lyrics available */
+      display: none;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
     .lyrics-toggle:hover {
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(1.05);
     }
     
     .lyrics-toggle.active {
@@ -269,10 +358,12 @@
     <div class="player-controls">
       <div class="track-info">
         <div>
-          <div class="track-name"></div>
+          <div class="track-name-container">
+            <div class="track-name"></div>
+            <div class="audio-quality"></div>
+          </div>
           <div class="artist-name"></div>
         </div>
-        <button class="lyrics-toggle">LYRICS</button>
       </div>
       
       <div class="progress-wrapper">
@@ -292,6 +383,8 @@
       <div class="lyrics-display active"></div>
       <div class="lyrics-display next"></div>
     </div>
+    
+    <button class="lyrics-toggle">LYRICS</button>
     
     <div class="play-button">
       <i class="fa-solid fa-play"></i>
@@ -316,6 +409,7 @@
       const lyricsContainer = $('.lyrics-container');
       const lyricsCurrent = $('.lyrics-display.active');
       const lyricsNext = $('.lyrics-display.next');
+      const audioQualityEl = $('.audio-quality');
       
       // Audio Element
       const audio = new Audio();
@@ -325,6 +419,11 @@
       let lyricsVisible = false;
       let currentLyricIndex = -1;
       let lyricsLoaded = false;
+      
+      // Audio specs variables
+      let audioType = '';
+      let audioBitrate = 0;
+      let audioSampleRate = 0;
       
       // Parse LRC file
       function parseLRC(text) {
@@ -350,6 +449,56 @@
         return result.sort((a, b) => a.time - b.time);
       }
       
+      // Detect file type from URL
+      function getFileTypeFromUrl(url) {
+        const extension = url.split('.').pop().toLowerCase();
+        return extension;
+      }
+      
+      // Display audio quality logo and specs
+      function displayAudioQuality(url) {
+        const fileType = getFileTypeFromUrl(url);
+        
+        // Default values
+        let logoClass = 'mp3-logo';
+        let formatText = 'MP3';
+        let specText = '320kbps';
+        let isHighQuality = false;
+        
+        if (fileType === 'flac') {
+          logoClass = 'lossless-logo shine';
+          formatText = 'FLAC';
+          specText = '44.1kHz';
+          isHighQuality = true;
+        } else if (fileType === 'wav') {
+          logoClass = 'lossless-logo shine';
+          formatText = 'WAV';
+          specText = '44.1kHz';
+          isHighQuality = true;
+        }
+        
+        // Create audio quality display
+        const formatLogo = `<div class="audio-format ${logoClass}">${formatText}</div>`;
+        const specDisplay = `<span class="audio-spec">${specText}</span>`;
+        
+        audioQualityEl.html(`${formatLogo}${specDisplay}`);
+        
+        return { fileType, isHighQuality };
+      }
+      
+      // Load audio metadata
+      function loadAudioMetadata() {
+        // Display quality based on file extension
+        const { fileType, isHighQuality } = displayAudioQuality(song.trackUrl);
+        audioType = fileType;
+        
+        // Set up audio element
+        audio.addEventListener('loadedmetadata', function() {
+          const duration = formatTime(audio.duration);
+          durationEl.text(duration);
+        });
+      }
+      
       // Load lyrics from LRC file
       function loadLyrics(url) {
         if (!url) {
@@ -372,9 +521,7 @@
               lyricsLoaded = true;
               lyricsToggle.css('display', 'block');
               // Auto show lyrics if available
-              lyricsVisible = true;
-              lyricsContainer.css('opacity', '1');
-              lyricsToggle.addClass('active');
+              toggleLyrics();
             }
           })
           .catch(error => {
@@ -396,26 +543,36 @@
           
           // Set current and next lyrics
           const currentText = lyrics[index]?.text || "";
-          const nextText = index < lyrics.length - 1 ? lyrics[index + 1]?.text || "" : "";
+          const nextText = (index < lyrics.length - 1) ? lyrics[index + 1]?.text || "" : "";
           
-          // Smoothly update texts without sudden appearances
-          // First set the next lyric
+          // Reset animations
+          lyricsCurrent.css({'animation': 'none', 'opacity': '0'});
+          lyricsNext.css({'animation': 'none', 'opacity': '0'});
+          
+          // Force reflow
+          void lyricsCurrent[0].offsetWidth;
+          void lyricsNext[0].offsetWidth;
+          
+          // Update text
+          lyricsCurrent.text(currentText);
           lyricsNext.text(nextText);
           
-          // Then update the current lyric with animation reset
-          lyricsCurrent.css('animation', 'none');
-          void lyricsCurrent[0].offsetWidth; // Trigger reflow
-          lyricsCurrent.text(currentText);
-          lyricsCurrent.css('animation', 'slideUp 0.5s ease forwards');
+          // Apply animations with slight delay for next lyric
+          lyricsCurrent.css('animation', 'fadeIn 0.3s ease forwards');
+          setTimeout(() => {
+            lyricsNext.css({'animation': 'fadeIn 0.3s ease forwards', 'opacity': '0.7'});
+          }, 150);
         }
       }
       
-      // Toggle lyrics visibility
+      // Toggle lyrics function
       function toggleLyrics() {
         lyricsVisible = !lyricsVisible;
+        
         if (lyricsVisible) {
           lyricsContainer.css('opacity', '1');
           lyricsToggle.addClass('active');
+          updateLyrics(audio.currentTime);
         } else {
           lyricsContainer.css('opacity', '0');
           lyricsToggle.removeClass('active');
@@ -432,6 +589,9 @@
         // Set audio source
         audio.src = song.trackUrl;
         
+        // Display audio quality
+        loadAudioMetadata();
+        
         // Load lyrics if URL is provided
         if (song.lrcUrl) {
           loadLyrics(song.lrcUrl);
@@ -439,12 +599,6 @@
         
         // Hide lyrics container initially
         lyricsContainer.css('opacity', '0');
-        
-        // Load audio metadata
-        audio.addEventListener('loadedmetadata', function() {
-          const duration = formatTime(audio.duration);
-          durationEl.text(duration);
-        });
         
         // Update progress and lyrics
         audio.addEventListener('timeupdate', function() {
@@ -489,7 +643,10 @@
       // Play or pause song
       function togglePlay() {
         if (audio.paused) {
-          audio.play();
+          audio.play().catch(error => {
+            console.error("Error playing audio:", error);
+            alert("Couldn't play this audio file. Try using an MP3, FLAC, or WAV file.");
+          });
           playIcon.removeClass('fa-play').addClass('fa-pause');
           playerContainer.addClass('playing');
         } else {
